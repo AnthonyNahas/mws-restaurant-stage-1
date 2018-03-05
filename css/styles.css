@@ -27,6 +27,7 @@ ul, li {
 a {
     color: orange;
     text-decoration: none;
+    padding: 1.5em;
 }
 
 a:hover, a:focus {
@@ -80,6 +81,7 @@ nav h1 a {
     font-weight: 200;
     letter-spacing: 10px;
     text-transform: uppercase;
+    padding: 1.5em;
 }
 
 #breadcrumb {
@@ -167,7 +169,6 @@ nav h1 a {
     min-height: 380px;
     padding: 0 30px 25px;
     text-align: left;
-    width: 270px;
 }
 
 #restaurants-list .restaurant-img {
@@ -202,7 +203,7 @@ nav h1 a {
     display: inline-block;
     font-size: 10pt;
     margin: 15px 0 0;
-    padding: 8px 30px 10px;
+    padding: 1.5em;
     text-align: center;
     text-decoration: none;
     text-transform: uppercase;
