@@ -74,8 +74,8 @@ nav {
 nav h1 {
     margin: auto;
     height: 100%;
-    width:100%;
-    display:flex;
+    width: 100%;
+    display: flex;
     align-items: center;
     justify-content: center;
 }
@@ -364,11 +364,9 @@ nav h1 a {
     flex-wrap: wrap;
     justify-content: space-between;
     background-color: #fff;
-    border: 2px solid #f3f3f3;
     list-style-type: none;
     margin: 0 0 30px;
     overflow: hidden;
-    padding: 1rem;
     position: relative;
     border-top-left-radius: 2rem;
     border-bottom-right-radius: 2rem;
@@ -381,15 +379,20 @@ nav h1 a {
 
 #reviews-list li p:first-child {
     width: 50%;
+    line-height: 3rem;
     text-align: left;
+    text-indent: 2rem;
     background-color: #333333;
     color: white;
-    font-weight: bold;
+    font-size: 1.3rem;
 }
 
 #reviews-list li p:nth-child(2) {
     width: 50%;
+    line-height: 3rem;
     text-align: right;
+    text-indent: 2rem;
+    direction: rtl;
     background-color: #333333;
     color: #aaaaaa;
 }
@@ -405,6 +408,11 @@ nav h1 a {
     letter-spacing: .1rem;
     border-radius: 0.3rem;
     border: 1px solid;
+    margin: 1rem 1rem 0 1rem;
+}
+
+#reviews-list li p:last-child {
+    margin: 1rem;
 }
 
 #restaurant-hours td {
