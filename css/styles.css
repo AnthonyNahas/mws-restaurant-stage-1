@@ -338,6 +338,7 @@ nav h1 a {
     display: block;
     margin-left: auto;
     margin-right: auto;
+    border-top-left-radius: 2rem;
 }
 
 #reviews-container {
@@ -351,7 +352,7 @@ nav h1 a {
     font-weight: 300;
     letter-spacing: -1px;
     padding-bottom: 1pt;
-    text-align: center;
+    /*text-align: center;*/
 }
 
 #reviews-list {
