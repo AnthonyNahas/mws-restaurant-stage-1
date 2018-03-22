@@ -157,7 +157,7 @@ nav h1 a {
     cursor: pointer;
 }
 
-.filter-options select:hover {
+.filter-options select:hover, .filter-options select:focus {
     background-color: orange;
     color: #fff;
 }
