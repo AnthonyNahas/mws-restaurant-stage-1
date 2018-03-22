@@ -1,0 +1,16 @@
+{
+  "short_name": "RR App",
+  "name": "Restaurant Review App",
+  "start_url": "/",
+  "theme_color": "#3397DB",
+  "background_color": "#ffffff",
+  "display": "standalone",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/assets/icons/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
