@@ -1,17 +1,34 @@
 let restaurants,
     neighborhoods,
     cuisines
-var map
-var markers = []
+var map;
+var markers = [];
 
 /**
  * Fetch neighborhoods and cuisines as soon as the page is loaded.
  */
 document.addEventListener('DOMContentLoaded', (event) => {
+    registerServiceWorker();
     fetchNeighborhoods();
     fetchCuisines();
 });
 
+/**
+ * Register service worker
+ */
+registerServiceWorker = () => {
+    if (!navigator.serviceWorker) return;
+
+    if ('serviceWorker' in navigator) {
+        // window.addEventListener('load', function () {
+        navigator.serviceWorker.register('/sw.js').then((reg) => {
+            console.log('Registration worked!');
+        }).catch((err) => {
+            console.log('Registration failed!', err);
+        });
+        // });
+    }
+};
 /**
  * Fetch all neighborhoods and set their HTML.
  */
@@ -24,7 +41,7 @@ fetchNeighborhoods = () => {
             fillNeighborhoodsHTML();
         }
     });
-}
+};
 
 /**
  * Set neighborhoods HTML.
@@ -37,7 +54,7 @@ fillNeighborhoodsHTML = (neighborhoods = self.neighborhoods) => {
         option.value = neighborhood;
         select.append(option);
     });
-}
+};
 
 /**
  * Fetch all cuisines and set their HTML.
@@ -51,7 +68,7 @@ fetchCuisines = () => {
             fillCuisinesHTML();
         }
     });
-}
+};
 
 /**
  * Set cuisines HTML.
@@ -81,7 +98,7 @@ window.initMap = () => {
         scrollwheel: false
     });
     updateRestaurants();
-}
+};
 
 /**
  * Update page and map for current restaurants.
@@ -104,7 +121,7 @@ updateRestaurants = () => {
             fillRestaurantsHTML();
         }
     })
-}
+};
 
 /**
  * Clear current restaurants, their HTML and remove their map markers.
@@ -119,7 +136,7 @@ resetRestaurants = (restaurants) => {
     self.markers.forEach(m => m.setMap(null));
     self.markers = [];
     self.restaurants = restaurants;
-}
+};
 
 /**
  * Create all restaurants HTML and add them to the webpage.
@@ -130,7 +147,7 @@ fillRestaurantsHTML = (restaurants = self.restaurants) => {
         ul.append(createRestaurantHTML(restaurant));
     });
     addMarkersToMap();
-}
+};
 
 /**
  * Create restaurant HTML.
@@ -178,4 +195,4 @@ addMarkersToMap = (restaurants = self.restaurants) => {
         });
         self.markers.push(marker);
     });
-}
+};

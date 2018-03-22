@@ -1,5 +1,5 @@
 let restaurant;
-var map;
+let map;
 
 /**
  * Initialize Google map, called from HTML.
@@ -43,7 +43,7 @@ fetchRestaurantFromURL = (callback) => {
             callback(null, restaurant)
         });
     }
-}
+};
 
 /**
  * Create restaurant HTML and add it to the webpage
