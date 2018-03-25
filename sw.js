@@ -14,7 +14,7 @@ self.addEventListener('install', (event) => {
                     'js/main.js',
                     'js/restaurant_info.js',
                     'index.html',
-                    ...addAllRestuarantPages(10)
+                    ...addAllRestaurantPages(10)
                 ]);
             })
     );
@@ -74,15 +74,31 @@ self.addEventListener('fetch', (event) => {
     );
 });
 
-function addAllRestuarantPages(range) {
+/**
+ * Iterate over a specific range to add the desired html page url to an array.
+ * Since the restaurant html page has a query param "id" in a range between 1 and x,
+ * the function will iterate over them and add these url to the result.
+ *
+ * @param range - the maximum numver of id of the restaurants.
+ * @returns {Array} - the result that contains all routed with ids to add for the
+ * service worker.
+ */
+addAllRestaurantPages = (range) => {
     let dynamicPagesURL = [];
     for (let i = 0; i <= range; i++) {
         i === 0 ? dynamicPagesURL.push('restaurant.html') : dynamicPagesURL.push(`restaurant.html?id=${i}`);
     }
     return dynamicPagesURL;
-}
+};
 
-function handleImagesURL(request) {
+/**
+ * Cache the images when they are requested.
+ *
+ * @param request - the outgoing request
+ * @returns {Promise<Cache>} - the image response from the cache if it is available,
+ * otherwise this will be fetched.
+ */
+handleImagesURL = (request) => {
     return caches
         .open('restaurant-images-v1')
         .then(cache => {
@@ -98,4 +114,4 @@ function handleImagesURL(request) {
                     });
                 });
         });
-}
+};

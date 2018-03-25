@@ -1,32 +1,32 @@
 let restaurants,
     neighborhoods,
-    cuisines
-var map;
-var markers = [];
+    cuisines,
+    map,
+    markers = [];
 
 /**
  * Fetch neighborhoods and cuisines as soon as the page is loaded.
  */
-document.addEventListener('DOMContentLoaded', (event) => {
+document.addEventListener('DOMContentLoaded', () => {
     registerServiceWorker();
     fetchNeighborhoods();
     fetchCuisines();
 });
 
 /**
- * Register service worker
+ * Register service worker to cache requests to all of the
+ * site’s assets so that any page that has been visited by a
+ * user will be accessible when the user is offline
  */
 registerServiceWorker = () => {
     if (!navigator.serviceWorker) return;
 
     if ('serviceWorker' in navigator) {
-        // window.addEventListener('load', function () {
-        navigator.serviceWorker.register('/sw.js').then((reg) => {
+        navigator.serviceWorker.register('/sw.js').then(() => {
             console.log('Registration worked!');
         }).catch((err) => {
             console.log('Registration failed!', err);
         });
-        // });
     }
 };
 /**
@@ -82,7 +82,7 @@ fillCuisinesHTML = (cuisines = self.cuisines) => {
         option.value = cuisine;
         select.append(option);
     });
-}
+};
 
 /**
  * Initialize Google map, called from HTML.
@@ -123,8 +123,11 @@ updateRestaurants = () => {
     })
 };
 
+
 /**
  * Clear current restaurants, their HTML and remove their map markers.
+ *
+ * @param restaurants - the selected restaurant
  */
 resetRestaurants = (restaurants) => {
     // Remove all restaurants
@@ -133,13 +136,16 @@ resetRestaurants = (restaurants) => {
     ul.innerHTML = '';
 
     // Remove all map markers
-    self.markers.forEach(m => m.setMap(null));
+    markers.forEach(m => m.setMap(null));
     self.markers = [];
     self.restaurants = restaurants;
 };
 
+
 /**
  * Create all restaurants HTML and add them to the webpage.
+ *
+ * @param restaurants - the selected restaurant
  */
 fillRestaurantsHTML = (restaurants = self.restaurants) => {
     const ul = document.getElementById('restaurants-list');
@@ -149,8 +155,12 @@ fillRestaurantsHTML = (restaurants = self.restaurants) => {
     addMarkersToMap();
 };
 
+
 /**
  * Create restaurant HTML.
+ *
+ * @param restaurant - the target restaurant to create the corresponding html element
+ * @returns {HTMLLIElement} - the correpsonded html element for the targeted restaurant
  */
 createRestaurantHTML = (restaurant) => {
     const li = document.createElement('li');
@@ -184,8 +194,11 @@ createRestaurantHTML = (restaurant) => {
     return li
 };
 
+
 /**
  * Add markers for current restaurants to the map.
+ *
+ * @param restaurants - the selected restaurants
  */
 addMarkersToMap = (restaurants = self.restaurants) => {
     restaurants.forEach(restaurant => {
