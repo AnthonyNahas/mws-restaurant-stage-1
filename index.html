@@ -23,18 +23,30 @@
 </head>
 
 <body>
-<header>
-    <nav>
-        <h1><a href="/" title="Go to the restaurant reviews"
-               aria-label="Go to the restaurant reviews">Restaurant
-            Reviews</a></h1>
+<!-- Beginning header -->
+<header role="banner">
+    <!-- Beginning nav -->
+    <nav role="navigation" aria-label="breadcrumb">
+        <h1>
+            <a href="/" title="Go to the restaurant reviews"
+               aria-current="page"
+               aria-label="Go to the restaurant reviews">
+                Restaurant Reviews
+            </a>
+        </h1>
     </nav>
+    <!-- End nav -->
 </header>
+<!-- End header -->
 
-<main id="maincontent">
-    <section id="map-container" aria-label="map of the restaurant">
-        <div id="map"></div>
+<!-- Beginning main -->
+<main id="maincontent" role="main">
+    <!-- Beginning map -->
+    <section id="map-container">
+        <div id="map" role="application" aria-label="map of the restaurant(s)"></div>
     </section>
+    <!-- End map -->
+
     <section aria-label="filter options">
         <div class="filter-options">
             <h2>Filter Results</h2>
@@ -49,6 +61,7 @@
         <ul id="restaurants-list"></ul>
     </section>
 </main>
+<!-- End main -->
 
 <script src="js/dbhelper.js"></script>
 <script src="js/main.js"></script>
@@ -56,7 +69,7 @@
         src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDYM--ycW16pQyaOni1krmeU9X6kD9FKGI&libraries=places&callback=initMap"></script>
 
 
-<footer id="footer">
+<footer id="footer" role="contentinfo">
     Copyright (c) 2017 <a href="/"><strong>Restaurant Reviews</strong></a> All Rights Reserved.
 </footer>
 

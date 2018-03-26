@@ -2,9 +2,18 @@ let restaurant;
 let map;
 
 /**
+ * Register the service worker as soon as the page is loaded.
+ */
+document.addEventListener('DOMContentLoaded', () => {
+    registerServiceWorker();
+});
+
+
+/**
  * Initialize Google map, called from HTML.
  */
 window.initMap = () => {
+    registerServiceWorker();
     fetchRestaurantFromURL((error, restaurant) => {
         if (error) { // Got an error!
             console.error(error);
@@ -21,16 +30,33 @@ window.initMap = () => {
 };
 
 /**
+ * Register service worker to cache requests to all of the
+ * site’s assets so that any page that has been visited by a
+ * user will be accessible when the user is offline
+ */
+registerServiceWorker = () => {
+    if (!navigator.serviceWorker) return;
+
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/sw.js').then(() => {
+            console.log('Registration worked!');
+        }).catch((err) => {
+            console.log('Registration failed!', err);
+        });
+    }
+};
+
+/**
  * Get current restaurant from page URL.
  */
 fetchRestaurantFromURL = (callback) => {
     if (self.restaurant) { // restaurant already fetched!
-        callback(null, self.restaurant)
+        callback(null, self.restaurant);
         return;
     }
     const id = getParameterByName('id');
     if (!id) { // no id found in URL
-        error = 'No restaurant id in URL'
+        error = 'No restaurant id in URL';
         callback(error, null);
     } else {
         DBHelper.fetchRestaurantById(id, (error, restaurant) => {
@@ -98,7 +124,7 @@ fillRestaurantHoursHTML = (operatingHours = self.restaurant.operating_hours) => 
  */
 fillReviewsHTML = (reviews = self.restaurant.reviews) => {
     const container = document.getElementById('reviews-container');
-    const title = document.createElement('h2');
+    const title = document.createElement('h4');
     title.innerHTML = 'Reviews';
     container.appendChild(title);
 

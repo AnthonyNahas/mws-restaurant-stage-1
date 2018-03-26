@@ -209,7 +209,7 @@ nav h1 a {
     box-shadow: 3px 3px 5px 6px #ccc;
 }
 
-#restaurants-list li h1 {
+#restaurants-list li h2 {
     color: #7d4f00;
     font-family: Arial, sans-serif;
     font-size: 1.5rem;
@@ -349,7 +349,7 @@ nav h1 a {
     order: 3;
 }
 
-#reviews-container h2 {
+#reviews-container h4 {
     color: #7d4f00;
     font-size: 1.8rem;
     font-weight: 300;
