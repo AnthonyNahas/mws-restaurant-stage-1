@@ -1,28 +1,36 @@
 const staticCacheName = 'restaurant-static-v1';
+const imagesCacheName = 'restaurant-images-v1';
 
 self.addEventListener('install', (event) => {
     console.log('on install service worker');
 
-    event.waitUntil(
-        caches
-            .open(staticCacheName)
-            .then((cache) => {
-                return cache.addAll([
-                    '/',
-                    'css/styles.css',
-                    'js/dbhelper.js',
-                    'js/main.js',
-                    'js/restaurant_info.js',
-                    'index.html',
-                    ...addAllRestaurantPages(10)
-                ]);
-            })
-    );
+    event.waitUntil(caches
+        .open(staticCacheName)
+        .then((cache) => {
+            console.log("open cache: ", staticCacheName);
+            cache.addAll([
+                '/',
+                'css/styles.css',
+                'js/dbhelper.js',
+                'js/main.js',
+                'js/restaurant_info.js',
+                'index.html',
+                'data/restaurants.json',
+                ...addAllRestaurantPages(10)
+            ]).then(() => {
+                caches.open(imagesCacheName)
+                    .then((cache) => {
+                        console.log("open cache: ", imagesCacheName);
+                        return cache.addAll(addAllRestaurantImages(10));
+                    })
+            });
+        })
+        .finally(() => console.log("finished with sw install")));
 });
 
 self.addEventListener('activate', (event) => {
     console.log('on activate service worker');
-    var cacheWhitelist = [staticCacheName];
+    let cacheWhitelist = [staticCacheName];
     event.waitUntil(
         caches.keys().then((cacheNames) => {
             return Promise.all(
@@ -57,7 +65,7 @@ self.addEventListener('fetch', (event) => {
                     .then((response) => {
 
                         if (response.status === 404) {
-                            return caches.match('pages/404.html');
+                            return caches.match('index.html');
                         }
 
                         return caches.open(staticCacheName).then((cache) => {
@@ -69,7 +77,7 @@ self.addEventListener('fetch', (event) => {
 
             }).catch(function (error) {
             console.error('Error, ', error);
-            return caches.match('pages/offline.html');
+            return caches.match('index.html');
         })
     );
 });
@@ -92,6 +100,22 @@ addAllRestaurantPages = (range) => {
 };
 
 /**
+ * Add all images url to the service worker.
+ *
+ * @param range - the maximum id of images
+ * @returns {*[]} - array of images url too add to the service worker
+ */
+addAllRestaurantImages = (range) => {
+    let fallbackImages = [], responsiveImages = [];
+    let responsiveSizes = [320, 480, 640, 800];
+    for (let i = 1; i <= range; i++) {
+        fallbackImages.push(`img/${i}.jpg`);
+        responsiveSizes.forEach((size) => responsiveImages.push(`img_responsive/${i}-${size}.jpg`));
+    }
+    return [...fallbackImages, ...responsiveImages];
+};
+
+/**
  * Cache the images when they are requested.
  *
  * @param request - the outgoing request
@@ -100,7 +124,7 @@ addAllRestaurantPages = (range) => {
  */
 handleImagesURL = (request) => {
     return caches
-        .open('restaurant-images-v1')
+        .open(imagesCacheName)
         .then(cache => {
             return cache.match(request.url)
                 .then(response => {
