@@ -25,4 +25,48 @@ In a terminal, check the version of Python you have: `python -V`. If you have Py
 Most of the code in this project has been written to the ES6 JavaScript specification for compatibility with modern web browsers and future proofing JavaScript code. As much as possible, try to maintain use of ES6 in any additional JavaScript you write. 
 
 
+---
 
+# Author: Anthony Nahas
+
+## Check Env Requirements
+#### _ensure please that these requirements are properly installed on your machine_
+- NodeJS 
+```bash 
+$ npm node -v
+```
+- NPM
+```bash 
+$ npm npm -v
+```
+- python (local server)
+```bash 
+$ python --version
+```
+## Install dependencies
+```bash 
+$ npm i
+```
+
+### Build Responsive Images - RUN ->
+```bash 
+$ grunt
+```
+
+### Run#
+- with python 2
+```bash 
+$ python -m SimpleHTTPServer 8000
+```
+or run the bash script `serve.sh`
+
+- with python 3
+```bash 
+$ python3 -m http.server 8000
+```
+
+##### Finally the site in your browser at `http://localhost:8000`
+
+
+#### Lighthouse Result Overview
+![](./lighthouse/ps-2018-03-26.png)
