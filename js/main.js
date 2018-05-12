@@ -33,14 +33,12 @@ registerServiceWorker = () => {
  * Fetch all neighborhoods and set their HTML.
  */
 fetchNeighborhoods = () => {
-    DBHelper.fetchNeighborhoods((error, neighborhoods) => {
-        if (error) { // Got an error
-            console.error(error);
-        } else {
+    DBHelper.fetchNeighborhoods()
+        .then(neighborhoods => {
             self.neighborhoods = neighborhoods;
             fillNeighborhoodsHTML();
-        }
-    });
+        })
+        .catch(error => console.error(error));
 };
 
 /**
@@ -60,14 +58,12 @@ fillNeighborhoodsHTML = (neighborhoods = self.neighborhoods) => {
  * Fetch all cuisines and set their HTML.
  */
 fetchCuisines = () => {
-    DBHelper.fetchCuisines((error, cuisines) => {
-        if (error) { // Got an error!
-            console.error(error);
-        } else {
+    DBHelper.fetchCuisines()
+        .then(cuisines => {
             self.cuisines = cuisines;
             fillCuisinesHTML();
-        }
-    });
+        })
+        .catch(error => console.error(error));
 };
 
 /**
@@ -113,14 +109,12 @@ updateRestaurants = () => {
     const cuisine = cSelect[cIndex].value;
     const neighborhood = nSelect[nIndex].value;
 
-    DBHelper.fetchRestaurantByCuisineAndNeighborhood(cuisine, neighborhood, (error, restaurants) => {
-        if (error) { // Got an error!
-            console.error(error);
-        } else {
+    DBHelper.fetchRestaurantByCuisineAndNeighborhood(cuisine, neighborhood)
+        .then(restaurants => {
             resetRestaurants(restaurants);
             fillRestaurantsHTML();
-        }
-    })
+        })
+        .catch(error => console.error(error));
 };
 
 
