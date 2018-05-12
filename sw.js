@@ -15,7 +15,6 @@ self.addEventListener('install', (event) => {
                 'js/main.js',
                 'js/restaurant_info.js',
                 'index.html',
-                'data/restaurants.json',
                 ...addAllRestaurantPages(10)
             ]).then(() => {
                 caches.open(imagesCacheName)
