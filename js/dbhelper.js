@@ -12,6 +12,41 @@ class DBHelper {
         return `http://localhost:${port}/restaurants`;
     }
 
+    static openDB() {
+        if (!this.checkindexedDB()) {
+            const error = "IndexedDB is not supported in your browser :(";
+            console.error(error);
+            return Promise.reject(error);
+        }
+
+        return idb.open('restaurants-reviews-db', 1, upgradeDb => {
+            upgradeDb.createObjectStore('restaurants', {
+                keyPath: 'id'
+            }).createIndex('name', 'id', {unique: true});
+        });
+    }
+
+    /**
+     * Adding restaurants to the indexedDB.
+     */
+    static addAllRestaurants(restaurants) {
+        return this.openDB()
+            .then(db => {
+                const tx = db.transaction('restaurants', 'readwrite');
+                let store = tx.objectStore('restaurants');
+                console.log("resto", restaurants);
+                return Promise.all(
+                    restaurants.map(restaurant => {
+                        return store.put(restaurant);
+                    })
+                ).catch(err => {
+                    tx.abort();
+                    console.error(err);
+                });
+            })
+            .catch(err => console.error(err));
+    }
+
     /**
      * Fetch all restaurants from the api.
      */
@@ -20,7 +55,12 @@ class DBHelper {
         return new Promise((resolve, reject) => {
             fetch(this.DATABASE_URL)
                 .then(result => {
-                    resolve(result.json());
+                    result.json()
+                        .then(restaurants => {
+                            console.log("all resto", restaurants);
+                            this.addAllRestaurants(restaurants);
+                            resolve(restaurants);
+                        }).catch(error => reject(error))
                 }).catch(err => {
                 reject(err);
             });
@@ -174,6 +214,16 @@ class DBHelper {
             }
         );
         return marker;
+    }
+
+    /**
+     * Check in indexedDB is supported by the browser
+     * of the end user
+     *
+     * @returns {boolean} - whether indexedDB is supported
+     */
+    static checkindexedDB() {
+        return 'indexedDB' in window;
     }
 
 }
