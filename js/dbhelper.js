@@ -29,7 +29,7 @@ class DBHelper {
     /**
      * Adding restaurants to the indexedDB.
      */
-    static addAllRestaurants(restaurants) {
+    static addAllRestaurantsToDB(restaurants) {
         return this.openDB()
             .then(db => {
                 const tx = db.transaction('restaurants', 'readwrite');
@@ -47,28 +47,56 @@ class DBHelper {
             .catch(err => console.error(err));
     }
 
-    /**
-     * Fetch all restaurants from the api.
-     */
-    static fetchRestaurants() {
-
-        return new Promise((resolve, reject) => {
-            fetch(this.DATABASE_URL)
-                .then(result => {
-                    result.json()
-                        .then(restaurants => {
-                            console.log("all resto", restaurants);
-                            this.addAllRestaurants(restaurants);
-                            resolve(restaurants);
-                        }).catch(error => reject(error))
-                }).catch(err => {
-                reject(err);
-            });
-        });
+    static getAllRestaurantsFromDB() {
+        return this.openDB()
+            .then(db => db
+                .transaction('restaurants2', 'readwrite')
+                .objectStore('restaurants')
+                .getAll()
+            )
     }
 
     /**
+     * * Fetch all restaurants from the api.
+     * On success, the fetched restaurants will be added to the db
+     *
+     * @returns {Promise<any>} - the fetched restaurants
+     */
+    static fetchRestaurantsFromAPI() {
+        return fetch(this.DATABASE_URL)
+            .then(result => result.json())
+            .then(restaurants => {
+                this.addAllRestaurantsToDB(restaurants);
+                return restaurants;
+            })
+            .catch(err => err);
+    }
+
+    /**
+     * Fetch all restaurants either from the api or from db.
+     *
+     * @returns {Promise<T | any>} - the fetched restaurants
+     */
+    static fetchRestaurants() {
+
+        return this.getAllRestaurantsFromDB()
+            .then(restaurants => {
+                console.log("restaurants size in db : ", restaurants.length);
+                if (restaurants && restaurants.length > 0) {
+                    return restaurants;
+                }
+                else {
+                    return this.fetchRestaurantsFromAPI();
+                }
+            })
+            .catch(error => this.fetchRestaurantsFromAPI());
+    }
+
+
+    /**
      * Fetch a restaurant by its ID from the api.
+     * @param id - the id of the restaurant
+     * @returns {Promise<any>} - the requested restaurant
      */
     static fetchRestaurantById(id) {
 
