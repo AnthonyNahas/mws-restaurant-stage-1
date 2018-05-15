@@ -47,12 +47,43 @@ class DBHelper {
             .catch(err => console.error(err));
     }
 
+    static addRestaurantByIDToDB(restaurant) {
+        return this.openDB()
+            .then(db => {
+                const tx = db.transaction('restaurants', 'readwrite');
+                let store = tx.objectStore('restaurants');
+                console.log("addRestaurandByIDToDB", restaurant);
+                return store.put(restaurant)
+                    .catch(err => {
+                        tx.abort();
+                        console.error(err);
+                    });
+            })
+            .catch(err => console.error(err));
+    }
+
+    /**
+     * Get all restaurants from db
+     *
+     * @returns {PromiseLike<T> | Promise<T>} - the stored restaurants
+     */
     static getAllRestaurantsFromDB() {
         return this.openDB()
             .then(db => db
                 .transaction('restaurants2', 'readwrite')
                 .objectStore('restaurants')
                 .getAll()
+            )
+    }
+
+    static getRestaurantByIDFromDB(id) {
+        return this.openDB()
+            .then(db => {
+                    var tx = db.transaction('restaurants', 'readonly');
+                    var store = tx.objectStore('restaurants');
+                    var index = store.index('name');
+                    return index.get(parseInt(id));
+                }
             )
     }
 
@@ -68,6 +99,17 @@ class DBHelper {
             .then(restaurants => {
                 this.addAllRestaurantsToDB(restaurants);
                 return restaurants;
+            })
+            .catch(err => err);
+    }
+
+    static fetchRestaurantsFromAPIByID(id) {
+        return fetch(`${this.DATABASE_URL}/${id}`)
+            .then(result => result.json())
+            .then(restaurant => {
+                console.log("getRestaurantByIDFromDB not found -> ", restaurant);
+                this.addRestaurantByIDToDB(restaurant);
+                return restaurant;
             })
             .catch(err => err);
     }
@@ -100,14 +142,16 @@ class DBHelper {
      */
     static fetchRestaurantById(id) {
 
-        return new Promise((resolve, reject) => {
-            fetch(`${this.DATABASE_URL}/${id}`)
-                .then(result => {
-                    resolve(result.json());
-                }).catch(err => {
-                reject(err);
-            });
-        });
+        return this.getRestaurantByIDFromDB(id)
+            .then(restaurant => {
+                if (restaurant) {
+                    console.log("getRestaurantByIDFromDB found -> ", restaurant);
+                    return restaurant;
+                }
+                return this.fetchRestaurantsFromAPIByID(id)
+            })
+            .catch(error => this.fetchRestaurantsFromAPIByID(id));
+
     }
 
     /**

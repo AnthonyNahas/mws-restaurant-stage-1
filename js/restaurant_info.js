@@ -16,6 +16,7 @@ window.initMap = () => {
     registerServiceWorker();
     fetchRestaurantFromURL()
         .then(restaurant => {
+            console.log("window.initMap with resto: ", restaurant);
             self.map = new google.maps.Map(document.getElementById('map'), {
                 zoom: 16,
                 center: restaurant.latlng,
@@ -52,12 +53,13 @@ fetchRestaurantFromURL = () => {
     return new Promise((resolve, reject) => {
 
         if (self.restaurant) { // restaurant already fetched!
+            console.log("restaurant already fetched: ", self.restaurant);
             resolve(self.restaurant);
         }
 
         const id = getParameterByName('id');
         if (!id) { // no id found in URL
-            error = 'No restaurant id in URL';
+            const error = 'No restaurant id in URL';
             reject(error);
         }
         else {
