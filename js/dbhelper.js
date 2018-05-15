@@ -69,11 +69,15 @@ class DBHelper {
      */
     static getAllRestaurantsFromDB() {
         return this.openDB()
-            .then(db => db
-                .transaction('restaurants2', 'readwrite')
-                .objectStore('restaurants')
-                .getAll()
-            )
+            .then(db => {
+                const restaurants = db
+                    .transaction('restaurants', 'readwrite')
+                    .objectStore('restaurants')
+                    .getAll();
+
+                console.log("getAllRestaurantsFromDB: ", restaurants);
+                return restaurants;
+            })
     }
 
     static getRestaurantByIDFromDB(id) {
