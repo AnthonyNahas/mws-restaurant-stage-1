@@ -1,6 +1,7 @@
 /*eslint-env node */
 
 const gulp = require('gulp');
+const compress = require('compression');
 const clean = require('gulp-clean');
 const sass = require('gulp-sass');
 const autoprefixer = require('gulp-autoprefixer');
@@ -34,14 +35,15 @@ const watch = (env) => {
 gulp.task('serve', ['build:dev'], () => {
 	watch('dev');
 	browserSync.init({
-		server: './dist'
+		server: './dist',
 	});
 });
 
 gulp.task('serve:prod', ['build:prod'], () => {
 	watch('prod');
 	browserSync.init({
-		server: './dist'
+		server: './dist',
+		middleware: [compress()]
 	});
 });
 
