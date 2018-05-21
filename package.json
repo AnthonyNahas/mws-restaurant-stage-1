@@ -4,6 +4,7 @@
   "description": "Restuarant Reviews Project as PWA",
   "main": "index.js",
   "scripts": {
+    "clean": "gulp clean",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -51,10 +52,14 @@
     "gulp-eslint": "^4.0.2",
     "gulp-gzip": "^1.4.2",
     "gulp-htmlmin": "^4.0.0",
+    "gulp-inject": "^4.3.2",
     "gulp-jasmine-phantom": "^3.0.0",
     "gulp-sass": "^4.0.1",
+    "gulp-size": "^3.0.0",
+    "gulp-sourcemaps": "^2.6.4",
     "gulp-uglify": "^3.0.0",
-    "idb": "^2.1.1"
+    "idb": "^2.1.1",
+    "run-sequence": "^2.2.1"
   },
   "dependencies": {}
 }
