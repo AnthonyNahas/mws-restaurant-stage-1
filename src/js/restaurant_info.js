@@ -33,7 +33,7 @@ window.initMap = () => {
  * site’s assets so that any page that has been visited by a
  * user will be accessible when the user is offline
  */
-registerServiceWorker = () => {
+self.registerServiceWorker = () => {
 	if (!navigator.serviceWorker) return;
 
 	if ('serviceWorker' in navigator) {
