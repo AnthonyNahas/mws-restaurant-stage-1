@@ -12,7 +12,6 @@ const sourcemaps = require('gulp-sourcemaps');
 const uglify = require('gulp-uglify');
 const inject = require('gulp-inject');
 const htmlmin = require('gulp-htmlmin');
-const gzip = require('gulp-gzip');
 const size = require('gulp-size');
 const runSequence = require('run-sequence');
 
@@ -196,12 +195,6 @@ gulp.task('lint', function () {
 		// To have the process exit with an error code (1) on
 		// lint error, return the stream and pipe to failOnError last.
 		.pipe(eslint.failOnError());
-});
-
-gulp.task('gzip', function () {
-	gulp.src('dist/js/**/*.js')
-		.pipe(gzip())
-		.pipe(gulp.dest('dist/js'));
 });
 
 gulp.task('tests', function () {
