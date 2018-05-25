@@ -18,11 +18,6 @@ const runSequence = require('run-sequence');
 
 const browserSync = require('browser-sync').create();
 
-
-gulp.task('serve',
-	[], () => {
-	});
-
 const watch = (env) => {
 	gulp.watch('src/css/**/*.css', ['styles']);
 	gulp.watch('src/js/sw/**/*.js', ['copy-sw']);
@@ -36,6 +31,7 @@ gulp.task('serve', ['build:dev'], () => {
 	watch('dev');
 	browserSync.init({
 		server: './dist',
+		port: 3001
 	});
 });
 
@@ -165,12 +161,10 @@ gulp.task('copy-idb', () => {
 
 gulp.task('copy-sw', function () {
 	gulp.src('src/js/sw/sw.js')
-	// .pipe(babel({
-	// 	presets: ['env']
-	// }))
-	// .pipe(uglify().on('error', function (e) {
-	// 	console.log(e);
-	// }))
+	// 	.pipe(babel({
+	// 		presets: ['env']
+	// 	}))
+	// 	.pipe(uglify())
 		.pipe(gulp.dest('dist/'));
 });
 
