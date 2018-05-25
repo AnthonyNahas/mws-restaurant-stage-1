@@ -4,27 +4,28 @@ const imagesCacheName = 'restaurant-images-v1';
 self.addEventListener('install', (event) => {
 	console.log('on install service worker');
 
-	event.waitUntil(caches
-		.open(staticCacheName)
-		.then((cache) => {
-			console.log('open cache: ', staticCacheName);
-			return cache.addAll([
-				'/',
-				'css/styles.css',
-				'js/lib/idb.js',
-				'js/main.js',
-				'js/restaurant.js',
-				'index.html',
-				...self.addAllRestaurantPages(10)
-			]).then(() => {
-				caches.open(imagesCacheName)
-					.then((cache) => {
-						console.log('open cache: ', imagesCacheName);
-						return cache.addAll(self.addAllRestaurantImages(10));
-					});
-			});
-		})
-		.finally(() => console.log('finished with sw install')));
+	event.waitUntil(
+		caches
+			.open(staticCacheName)
+			.then((cache) => {
+				console.log('open cache: ', staticCacheName);
+				return cache.addAll([
+					'css/styles.css',
+					'js/lib/idb.js',
+					'js/main.js',
+					'js/restaurant.js',
+					'index.html',
+					'restaurant.html',
+					...self.addAllRestaurantPages(10)
+				]).then(() => {
+					caches.open(imagesCacheName)
+						.then((cache) => {
+							console.log('open cache: ', imagesCacheName);
+							return cache.addAll(self.addAllRestaurantImages(10));
+						});
+				});
+			})
+			.finally(() => console.log('finished with sw install')));
 });
 
 self.addEventListener('activate', (event) => {
@@ -47,38 +48,45 @@ self.addEventListener('fetch', (event) => {
 	// console.log("fetching: ", event);
 	let requestUrl = new URL(event.request.url);
 	if (requestUrl.pathname.startsWith('/img')) {
-		event.respondWith(handleImagesURL(event.request));
+		event.respondWith(self.handleImagesURL(event.request));
 		return;
 	}
 
-	event.respondWith(
-		caches
-			.match(event.request)
-			.then((response) => {
-				if (response) {
-					return response;
-				}
-				let fetchRequest = event.request.clone();
+	if (event.request.method === 'GET' &&
+		+    // Ensure that chrome-extension:// requests don't trigger the default route.
+			+event.request.url.indexOf('http') === 0) {
+		event.respondWith(
+			caches
+				.match(event.request)
+				.then((response) => {
+					if (response) {
+						return response;
+					}
 
-				return fetch(fetchRequest)
-					.then((response) => {
+					let fetchRequest = event.request.clone();
 
-						if (response.status === 404) {
-							return caches.match('index.html');
-						}
+					return fetch(fetchRequest)
+						.then((response) => {
 
-						return caches.open(staticCacheName).then((cache) => {
-							cache.put(fetchRequest.url, response.clone());
+							if (response.status === 404) {
+								return caches.match('index.html');
+							}
 
-							return response;
+							return caches.open(staticCacheName).then((cache) => {
+								console.log('fetchRequest.url', fetchRequest.url);
+								console.log('response', response);
+								cache.put(fetchRequest.url, response.clone());
+
+								return response;
+							});
 						});
-					});
 
-			}).catch(function (error) {
-			console.error('Error, ', error);
-			return caches.match('index.html');
-		})
-	);
+				}).catch(function (error) {
+				console.error('Error, ', error);
+				return caches.match('index.html');
+			})
+		);
+	}
 });
 
 /**
@@ -91,6 +99,7 @@ self.addEventListener('fetch', (event) => {
  * service worker.
  */
 self.addAllRestaurantPages = (range) => {
+	console.log('addAllRestaurantPages');
 	let dynamicPagesURL = [];
 	for (let i = 0; i <= range; i++) {
 		i === 0 ? dynamicPagesURL.push('restaurant.html') : dynamicPagesURL.push(`restaurant.html?id=${i}`);
@@ -106,12 +115,14 @@ self.addAllRestaurantPages = (range) => {
  * @returns {*[]} - array of images url too add to the service worker
  */
 self.addAllRestaurantImages = (range) => {
+	console.log('addAllRestaurantImages');
 	let fallbackImages = [], responsiveImages = [];
 	let responsiveSizes = [320, 480, 640, 800];
 	for (let i = 1; i <= range; i++) {
 		fallbackImages.push(`img/${i}.jpg`);
 		responsiveSizes.forEach((size) => responsiveImages.push(`img_responsive/${i}-${size}.jpg`));
 	}
+	console.log('all images = ', [...fallbackImages, ...responsiveImages]);
 	return [...fallbackImages, ...responsiveImages];
 };
 
@@ -132,7 +143,7 @@ self.handleImagesURL = (request) => {
 						return response;
 					}
 
-					return fetch(request).then(response => {
+					fetch(request).then(response => {
 						cache.put(request.url, response.clone());
 						return response;
 					});
