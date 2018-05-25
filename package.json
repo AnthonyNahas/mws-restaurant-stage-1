@@ -44,6 +44,7 @@
     "babel-preset-env": "^1.7.0",
     "browser-sync": "^2.24.4",
     "compression": "^1.7.2",
+    "express": "^4.16.3",
     "grunt": "~0.4.5",
     "grunt-contrib-clean": "~0.6.0",
     "grunt-contrib-copy": "~0.8.0",
@@ -66,7 +67,8 @@
     "gulp-sourcemaps": "^2.6.4",
     "gulp-uglify": "^3.0.0",
     "idb": "^2.1.1",
-    "run-sequence": "^2.2.1"
+    "run-sequence": "^2.2.1",
+    "serve-static": "latest"
   },
   "dependencies": {}
 }
