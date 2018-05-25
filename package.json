@@ -5,6 +5,13 @@
   "main": "index.js",
   "scripts": {
     "clean": "gulp clean",
+    "clean:responisve:images": "grunt clean",
+    "build": "gulp build:dev",
+    "build:prod": "grunt && gulp build:prod",
+    "build:responisve:images": "grunt",
+    "pwa": "grunt && gulp serve:prod",
+    "serve": "gulp serve",
+    "serve:prod": "gulp serve:prod",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
