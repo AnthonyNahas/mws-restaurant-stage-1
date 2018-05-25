@@ -11,7 +11,6 @@ const concat = require('gulp-concat');
 const babel = require('gulp-babel');
 const sourcemaps = require('gulp-sourcemaps');
 const uglify = require('gulp-uglify');
-const inject = require('gulp-inject');
 const htmlmin = require('gulp-htmlmin');
 const size = require('gulp-size');
 const runSequence = require('run-sequence');
@@ -86,7 +85,6 @@ gulp.task('clean', () => {
 
 gulp.task('scripts:main:dev', function () {
 	gulp.src(['src/js/main.js', 'src/js/dbhelper.js'])
-		.pipe(concat('main.js'))
 		.pipe(gulp.dest('dist/js'));
 });
 
@@ -99,14 +97,12 @@ gulp.task('scripts:main:prod', function () {
 		.pipe(uglify().on('error', (e) => {
 			console.log(e);
 		}))
-		.pipe(concat('main.js'))
 		.pipe(sourcemaps.write('.'))
 		.pipe(gulp.dest('dist/js'));
 });
 
 gulp.task('scripts:restaurant:dev', () => {
 	gulp.src(['src/js/restaurant_info.js', 'src/js/dbhelper.js'])
-		.pipe(concat('restaurant.js'))
 		.pipe(gulp.dest('dist/js'));
 });
 
@@ -119,7 +115,6 @@ gulp.task('scripts:restaurant:prod', () => {
 		.pipe(uglify().on('error', (e) => {
 			console.log(e);
 		}))
-		.pipe(concat('restaurant.js'))
 		.pipe(sourcemaps.write('.'))
 		.pipe(gulp.dest('dist/js'));
 });
@@ -191,38 +186,5 @@ gulp.task('lint', function () {
 		// To have the process exit with an error code (1) on
 		// lint error, return the stream and pipe to failOnError last.
 		.pipe(eslint.failOnError());
-});
-
-gulp.task('tests', function () {
-	gulp.src('tests/spec/extraSpec.js')
-		.pipe(jasmine({
-			integration: true,
-			vendor: 'js/**/*.js'
-		}));
-});
-
-gulp.task('inject:html', ['html:inject:index', 'html:inject:restaurant']);
-
-gulp.task('html:inject:index', () => {
-	const target = gulp.src('src/html/index.html');
-	// It's not necessary to read the files (will speed up things), we're only after their paths:
-	const sources = gulp.src(['dist/js/**/*.js', '!dist/js/restaurant.js', 'dist/**/*.css'], {read: false});
-
-	return target
-		.pipe(inject(sources), {relative: false})
-		.pipe(htmlmin({collapseWhitespace: true}))
-		.pipe(gulp.dest('./dist'));
-});
-
-
-gulp.task('html:inject:restaurant', () => {
-	const target = gulp.src('dist/restaurant.html');
-	// It's not necessary to read the files (will speed up things), we're only after their paths:
-	const sources = gulp.src(['dist/js/**/*.js', '!dist/js/main.js', 'dist/**/*.css'], {read: false});
-
-	return target
-		.pipe(inject(sources), {relative: true})
-		.pipe(htmlmin({collapseWhitespace: true}))
-		.pipe(gulp.dest('./dist'));
 });
 
