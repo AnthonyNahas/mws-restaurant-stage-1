@@ -47,6 +47,7 @@ gulp.task('build:dev', (callback) => {
 		[
 			'html',
 			'styles',
+			'copy-assets',
 			'copy-images',
 			'copy-manifest.json',
 			'copy-manifest',
@@ -64,6 +65,7 @@ gulp.task('build:prod', (callback) => {
 		[
 			'html',
 			'styles',
+			'copy-assets',
 			'copy-images',
 			'copy-manifest.json',
 			'copy-manifest',
@@ -130,6 +132,11 @@ gulp.task('copy-images', function () {
 		.pipe(gulp.dest('dist/img_responsive'));
 });
 
+gulp.task('copy-assets', () => {
+	gulp.src('src/assets/**/*')
+		.pipe(gulp.dest('dist/assets'));
+});
+
 gulp.task('copy-manifest.json', () => {
 	gulp.src('src/manifest.json')
 		.pipe(gulp.dest('dist/'));
@@ -156,10 +163,10 @@ gulp.task('copy-idb', () => {
 
 gulp.task('copy-sw', function () {
 	gulp.src('src/js/sw/sw.js')
-	// 	.pipe(babel({
-	// 		presets: ['env']
-	// 	}))
-	// 	.pipe(uglify())
+		.pipe(babel({
+			presets: ['env']
+		}))
+		.pipe(uglify())
 		.pipe(gulp.dest('dist/'));
 });
 
