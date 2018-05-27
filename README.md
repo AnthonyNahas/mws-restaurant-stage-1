@@ -1,4 +1,6 @@
 # Mobile Web Specialist Certification Course
+
+
 ---
 #### _Three Stage Course Material Project - Restaurant Reviews_
 
@@ -41,7 +43,7 @@ Most of the code in this project has been written to the ES6 JavaScript specific
 Stage 2 consists of two parts!
 
 - server side (NodeJS)
-- client side (html, css, js)
+- client side (html, css, js) - hosted with NodeJS and express
 
 ## Check Env Requirements
 #### _ensure please that these requirements are properly installed on your machine_
@@ -52,10 +54,6 @@ $ npm node -v
 - NPM
 ```bash 
 $ npm npm -v
-```
-- python (local server) - optional
-```bash 
-$ python --version
 ```
 
 ## Server Side
@@ -75,7 +73,7 @@ $ npm i
 $ npm i -g sails
 ```
 
-### (4) Run the api server
+### (4) Run the api server locally
 ```bash 
 $ node server
 ```
@@ -89,9 +87,9 @@ $ node server
 $ npm i
 ```
 
-### Run the PWA
+### Run the PWA by build the app and then hosting it with NodeJS and express
 ```bash 
-$ npm run pwa
+$ npm start
 ```
 
 the app will be hosted on port `3000` -> `localhost:3000`
@@ -105,24 +103,23 @@ the app will be hosted on port `3000` -> `localhost:3000`
 $ grunt
 ```
 
-#### Run (optional)
+### Build the app for production
 ```bash 
-$ cd dist
+$ gulp build:prod
 ```
 
-- with python 2
-```bash 
-$ python -m SimpleHTTPServer 8000
-```
-or run the bash script `serve.sh`
 
-- with python 3
-```bash 
-$ python3 -m http.server 8000
-```
+#### Lighthouse Result Overview - index.html
+![](lighthouse/stage2_index.png)
 
-##### Finally the site in your browser at `http://localhost:8000`
+[see the full result](lighthouse/stage2_index_.html)
+
+#### Lighthouse Result Overview - restaurant.html
+![](lighthouse/stage2_restaurant.png)
+
+[see the full result](lighthouse/stage2_restaurant_.html)
 
 
-#### Lighthouse Result Overview
-![](./lighthouse/ps-2018-03-26.png)
+# Author
+
+[Anthony Nahas](https://github.com/AnthonyNahas)
