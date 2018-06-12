@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
 /**
  * Initialize Google map, called from HTML.
  */
-window.initMap = () => {
+window.initMap2 = () => {
 	self.registerServiceWorker();
 	self.fetchRestaurantFromURL()
 		.then(restaurant => {

@@ -72,6 +72,13 @@
 <script async defer
         src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDYM--ycW16pQyaOni1krmeU9X6kD9FKGI&libraries=places&callback=initMap"></script>
 
+<script>
+	if ('serviceWorker' in navigator) {
+		navigator.serviceWorker.register('/sw.js')
+			.then(() => console.log('Registration worked!'))
+			.catch((err) => console.log('Registration failed!', err));
+	}
+</script>
 
 <footer id="footer" role="contentinfo">
     Copyright (c) 2017 <a href="/"><strong>Restaurant Reviews</strong></a> All Rights Reserved.
