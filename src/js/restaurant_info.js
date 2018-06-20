@@ -6,27 +6,27 @@ let map;
  */
 document.addEventListener('DOMContentLoaded', () => {
 	self.registerServiceWorker();
+
+	// Initialize Google map, called from HTML.
+	window.initMap = () => {
+		self.registerServiceWorker();
+		self.fetchRestaurantFromURL()
+			.then(restaurant => {
+				console.log('window.initMap with resto: ', restaurant);
+				setTimeout(() => {
+					self.map = new google.maps.Map(document.getElementById('map'), {
+						zoom: 16,
+						center: restaurant.latlng,
+						scrollwheel: false
+					});
+				}, 2000);
+				self.fillBreadcrumb();
+				DBHelper.mapMarkerForRestaurant(self.restaurant, self.map);
+			})
+			.catch(error => console.error(error));  // Got an error!
+	};
+
 });
-
-
-/**
- * Initialize Google map, called from HTML.
- */
-window.initMap2 = () => {
-	self.registerServiceWorker();
-	self.fetchRestaurantFromURL()
-		.then(restaurant => {
-			console.log('window.initMap with resto: ', restaurant);
-			self.map = new google.maps.Map(document.getElementById('map'), {
-				zoom: 16,
-				center: restaurant.latlng,
-				scrollwheel: false
-			});
-			self.fillBreadcrumb();
-			DBHelper.mapMarkerForRestaurant(self.restaurant, self.map);
-		})
-		.catch(error => console.error(error));  // Got an error!
-};
 
 /**
  * Register service worker to cache requests to all of the
