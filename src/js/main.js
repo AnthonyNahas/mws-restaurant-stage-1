@@ -99,22 +99,6 @@ self.fillCuisinesHTML = (cuisines = self.cuisines) => {
 };
 
 /**
- * Initialize Google map, called from HTML.
- */
-// self.initMap = () => {
-// 	let loc = {
-// 		lat: 40.722216,
-// 		lng: -73.987501
-// 	};
-// 	self.map = new google.maps.Map(document.getElementById('map'), {
-// 		zoom: 12,
-// 		center: loc,
-// 		scrollwheel: false
-// 	});
-// 	// self.updateRestaurants();
-// };
-
-/**
  * Update page and map for current restaurants.
  */
 self.updateRestaurants = () => {
@@ -164,7 +148,9 @@ self.fillRestaurantsHTML = (restaurants = self.restaurants) => {
 	restaurants.forEach(restaurant => {
 		ul.append(self.createRestaurantHTML(restaurant));
 	});
-	self.addMarkersToMap();
+	if (map) {
+		self.addMarkersToMap();
+	}
 };
 
 
@@ -197,11 +183,22 @@ self.createRestaurantHTML = (restaurant) => {
 	address.innerHTML = restaurant.address;
 	li.append(address);
 
+	const actionsContainer = document.createElement('div');
+
+	const likeButton = document.createElement('button');
+
+	likeButton.dataset.isFavorite = restaurant.is_favorite ? restaurant.is_favorite : false;
+	self.setLikeButtonStyles(likeButton);
+	likeButton.setAttribute('aria-label', `Like or dislike ${restaurant.name}'s restaurant`);
+	self.setLikeButtonListener(restaurant, likeButton);
+	actionsContainer.append(likeButton);
+
 	const more = document.createElement('a');
 	more.innerHTML = 'View Details';
-	more.href = DBHelper.urlForRestaurant(restaurant);
 	more.setAttribute('aria-label', `View Details of the ${restaurant.name}'s restaurant`);
-	li.append(more);
+	actionsContainer.append(more);
+
+	li.append(actionsContainer);
 
 	return li;
 };
@@ -221,5 +218,33 @@ self.addMarkersToMap = (restaurants = self.restaurants) => {
 			window.location.href = marker.url;
 		});
 		self.markers.push(marker);
+	});
+};
+
+self.setLikeButtonStyles = (button) => {
+	if (button.dataset.isFavorite === 'false') {
+		button.innerText = '🧡';
+		button.classList.add('isFavorite');
+	} else {
+		button.innerText = 'Like';
+		button.classList.remove('isFavorite');
+	}
+};
+
+self.setLikeButtonListener = (restaurant, button) => {
+	button.addEventListener('click', $event => {
+		console.log('before update is favorite of the restaurant', restaurant.is_favorite);
+
+		self.setLikeButtonStyles($event.target);
+
+
+		$event.target.dataset.isFavorite = $event.target.dataset.isFavorite !== 'true';
+
+		restaurant.is_favorite = $event.target.dataset.isFavorite;
+
+		console.log('update is favorite of the restaurant', restaurant.is_favorite);
+
+		// Update the API and IDB
+		DBHelper.updateRestaurantByIsFavorite(restaurant);
 	});
 };

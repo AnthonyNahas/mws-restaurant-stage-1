@@ -225,7 +225,7 @@ nav h1 a {
     font-size: 1rem;
 }
 
-#restaurants-list li a {
+#restaurants-list li a, button {
     background-color: #7d4f00;
     color: #fff;
     margin: 1rem 0 0;
@@ -243,12 +243,25 @@ nav h1 a {
     border-image-repeat: initial;
     display: flex;
     justify-content: center;
+    cursor: pointer;
+}
 
+#restaurants-list div {
+    flex-direction: column;
+    flex: 1;
+    flex-wrap: wrap;
+    display: flex;
+    width: 100%;
+}
+
+.isFavorite {
+    color: #7d4f00;
+    background-color: #fff;
 }
 
 /* ====================== Change link effect on hover for UX ====================== */
 
-#restaurants-list li a:hover {
+#restaurants-list li a:hover, button:hover {
     color: #7d4f00;
     background-color: #fff;
 }
