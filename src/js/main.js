@@ -16,11 +16,13 @@ document.addEventListener('DOMContentLoaded', () => {
 			lng: -73.987501
 		};
 		setTimeout(() => {
+			console.log('create map');
 			self.map = new google.maps.Map(document.getElementById('map'), {
 				zoom: 12,
 				center: loc,
 				scrollwheel: false
 			});
+			self.addMarkersToMap();
 		}, 2000);
 		self.updateRestaurants();
 	};
@@ -211,6 +213,7 @@ self.createRestaurantHTML = (restaurant) => {
  * @param restaurants - the selected restaurants
  */
 self.addMarkersToMap = (restaurants = self.restaurants) => {
+	console.log('add markers');
 	restaurants.forEach(restaurant => {
 		// Add marker to the map
 		const marker = DBHelper.mapMarkerForRestaurant(restaurant, self.map);

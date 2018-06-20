@@ -19,9 +19,9 @@ document.addEventListener('DOMContentLoaded', () => {
 						center: restaurant.latlng,
 						scrollwheel: false
 					});
+					DBHelper.mapMarkerForRestaurant(self.restaurant, self.map);
 				}, 2000);
 				self.fillBreadcrumb();
-				DBHelper.mapMarkerForRestaurant(self.restaurant, self.map);
 			})
 			.catch(error => console.error(error));  // Got an error!
 	};

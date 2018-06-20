@@ -14,6 +14,7 @@
     "serve": "gulp serve",
     "serve:prod": "gulp serve:prod",
     "start": "npm run build:prod && node server.js",
+    "start:without:imgs": "gulp build:prod && node server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
