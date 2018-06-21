@@ -21,7 +21,7 @@ self.addEventListener('install', (event) => {
 				]).then(() => {
 					caches.open(imagesCacheName)
 						.then((cache) => {
-							console.log('open cache: ', imagesCacheName);
+							// console.log('open cache: ', imagesCacheName);
 							return cache.addAll(self.addAllRestaurantImages(10));
 						});
 				});
@@ -74,8 +74,8 @@ self.addEventListener('fetch', (event) => {
 							}
 
 							return caches.open(staticCacheName).then((cache) => {
-								console.log('fetchRequest.url', fetchRequest.url);
-								console.log('response', response);
+								// console.log('fetchRequest.url', fetchRequest.url);
+								// console.log('response', response);
 								cache.put(fetchRequest.url, response.clone());
 
 								return response;

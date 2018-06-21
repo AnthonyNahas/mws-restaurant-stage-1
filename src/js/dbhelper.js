@@ -7,9 +7,18 @@ class DBHelper {
 	 * Database URL.
 	 *
 	 */
-	static get DATABASE_URL() {
+	static get RESTAURANTS_URL() {
 		const port = 1337;
 		return `http://localhost:${port}/restaurants`;
+	}
+
+	/**
+	 * Database URL.
+	 *
+	 */
+	static get REVIEWS_URL() {
+		const port = 1337;
+		return `http://localhost:${port}/reviews`;
 	}
 
 	static openDB() {
@@ -22,22 +31,32 @@ class DBHelper {
 		return idb.open('restaurants-reviews-db', 1, upgradeDb => {
 			upgradeDb.createObjectStore('restaurants', {
 				keyPath: 'id'
-			}).createIndex('name', 'id', {unique: true});
+			});
+
+			upgradeDb.createObjectStore('reviews', {
+				keyPath: 'id',
+			});
+
+			upgradeDb.createObjectStore('pending-reviews', {
+				keyPath: 'id',
+				autoIncrement: true
+			});
+
 		});
 	}
 
 	/**
-	 * Adding restaurants to the indexedDB.
+	 * Adding data to the indexedDB by transaction and store name
 	 */
-	static addAllRestaurantsToDB(restaurants) {
+	static addAllToDB(transactionAndStoreName, data) {
 		return this.openDB()
 			.then(db => {
-				const tx = db.transaction('restaurants', 'readwrite');
-				let store = tx.objectStore('restaurants');
-				console.log('resto', restaurants);
+				const tx = db.transaction(transactionAndStoreName, 'readwrite');
+				let store = tx.objectStore(transactionAndStoreName);
+				console.log('data added to the db: ', data);
 				return Promise.all(
-					restaurants.map(restaurant => {
-						return store.put(restaurant);
+					data.map(data => {
+						return store.put(data);
 					})
 				).catch(err => {
 					tx.abort();
@@ -67,12 +86,12 @@ class DBHelper {
 	 *
 	 * @returns {PromiseLike<T> | Promise<T>} - the stored restaurants
 	 */
-	static getAllRestaurantsFromDB() {
+	static getAllFromDB(transactionAndStoreName) {
 		return this.openDB()
 			.then(db => {
 				const restaurants = db
-					.transaction('restaurants', 'readwrite')
-					.objectStore('restaurants')
+					.transaction(transactionAndStoreName, 'readwrite')
+					.objectStore(transactionAndStoreName)
 					.getAll();
 
 				console.log('getAllRestaurantsFromDB: ', restaurants);
@@ -80,13 +99,12 @@ class DBHelper {
 			});
 	}
 
-	static getRestaurantByIDFromDB(id) {
+	static getDataByIDFromDB(transactionAndStoreName, id) {
 		return this.openDB()
 			.then(db => {
-					var tx = db.transaction('restaurants', 'readonly');
-					var store = tx.objectStore('restaurants');
-					var index = store.index('name');
-					return index.get(parseInt(id));
+					var tx = db.transaction(transactionAndStoreName, 'readonly');
+					var store = tx.objectStore(transactionAndStoreName);
+					return store.get(parseInt(id));
 				}
 			);
 	}
@@ -98,17 +116,17 @@ class DBHelper {
 	 * @returns {Promise<any>} - the fetched restaurants
 	 */
 	static fetchRestaurantsFromAPI() {
-		return fetch(this.DATABASE_URL)
+		return fetch(this.RESTAURANTS_URL)
 			.then(result => result.json())
 			.then(restaurants => {
-				this.addAllRestaurantsToDB(restaurants);
+				this.addAllToDB('restaurants', restaurants);
 				return restaurants;
 			})
 			.catch(err => err);
 	}
 
 	static fetchRestaurantsFromAPIByID(id) {
-		return fetch(`${this.DATABASE_URL}/${id}`)
+		return fetch(`${this.RESTAURANTS_URL}/${id}`)
 			.then(result => result.json())
 			.then(restaurant => {
 				console.log('getRestaurantByIDFromDB not found -> ', restaurant);
@@ -125,7 +143,7 @@ class DBHelper {
 	 */
 	static fetchRestaurants() {
 
-		return this.getAllRestaurantsFromDB()
+		return this.getAllFromDB('restaurants')
 			.then(restaurants => {
 				console.log('restaurants size in db : ', restaurants.length);
 				if (restaurants && restaurants.length > 0) {
@@ -138,6 +156,53 @@ class DBHelper {
 			.catch(error => this.fetchRestaurantsFromAPI());
 	}
 
+	/**
+	 * Fetch all reviews either from the api or from db.
+	 *
+	 * @returns {Promise<T | any>} - the fetched reviews
+	 */
+	static fetchRestaurantReviewsByID(id) {
+
+		return this.getDataByIDFromDB('reviews', id)
+			.then(reviews => {
+				console.log('reviews size in db : ', reviews.length);
+				if (reviews && reviews.length > 0) {
+					return reviews;
+				}
+				else {
+					return this.fetchRestaurantReviewsFromAPI(id);
+				}
+			})
+			.catch(error => this.fetchRestaurantReviewsFromAPI(id));
+	}
+
+	/**
+	 * Fetch all reviews of a restaurant by restaurant's id
+	 */
+	static fetchRestaurantReviewsFromAPI(id) {
+		return fetch(`${this.REVIEWS_URL}/?restaurant_id=${id}`)
+			.then(result => result.json())
+			.then(reviews => {
+				console.log('fetchRestaurantReviews -> ', reviews);
+				this.addAllToDB('reviews', reviews);
+				return reviews;
+			})
+			.catch(err => err);
+	}
+
+	/**
+	 * Fetch a reviews of a restaurant by review's id
+	 */
+	static fetchReviewByIdFromAPI(id) {
+		return fetch(`${this.REVIEWS_URL}/${id}`)
+			.then(result => result.json())
+			.then(review => {
+				console.log('fetchReviewById -> ', review);
+				// this.addRestaurantByIDToDB(review);
+				return review;
+			})
+			.catch(err => err);
+	}
 
 	/**
 	 * Fetch a restaurant by its ID from the api.
@@ -146,7 +211,7 @@ class DBHelper {
 	 */
 	static fetchRestaurantById(id) {
 
-		return this.getRestaurantByIDFromDB(id)
+		return this.getDataByIDFromDB('restaurant', id)
 			.then(restaurant => {
 				if (restaurant) {
 					console.log('getRestaurantByIDFromDB found -> ', restaurant);
@@ -254,14 +319,14 @@ class DBHelper {
 		if (!restaurant) return;
 
 		return fetch(
-			`${DBHelper.DATABASE_URL}/${restaurant.id}/?is_favorite=${restaurant.is_favorite}`,
+			`${DBHelper.RESTAURANTS_URL}/${restaurant.id}/?is_favorite=${restaurant.is_favorite}`,
 			{
 				method: 'PUT'
 			}
 		)
 			.then(response => response.json())
 			.then(data => {
-				// DBHelper.saveToIDB(self.restaurants, 'restaurants', 'restaurants');
+				this.addRestaurantByIDToDB(data);
 				console.log('update done: ', data);
 				return data;
 			})
@@ -323,4 +388,13 @@ class DBHelper {
 		return 'indexedDB' in window;
 	}
 
+	/**
+	 * get all from db by transaction and store
+	 */
+	static getAll(transactionName, storeName) {
+		return DBHelper.openDB().then(db => {
+			const index = db.transaction(transactionName).objectStore(storeName);
+			return index.getAll();
+		});
+	}
 }

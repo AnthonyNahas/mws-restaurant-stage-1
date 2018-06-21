@@ -66,6 +66,7 @@ self.fetchRestaurantFromURL = () => {
 			DBHelper.fetchRestaurantById(id)
 				.then(restaurant => {
 					self.restaurant = restaurant;
+					console.log('fetched resto by id: ', restaurant);
 					self.fillRestaurantHTML();
 					resolve(restaurant);
 				})
@@ -102,7 +103,12 @@ self.fillRestaurantHTML = (restaurant = self.restaurant) => {
 		self.fillRestaurantHoursHTML();
 	}
 	// fill reviews
-	self.fillReviewsHTML();
+	DBHelper.fetchRestaurantReviewsByID(restaurant.id)
+		.then(reviews => {
+			console.log('on fetchRestaurantReviewsByID: ', reviews);
+			self.fillReviewsHTML(reviews);
+		})
+		.catch(error => console.error(error));
 };
 
 /**
@@ -128,13 +134,13 @@ self.fillRestaurantHoursHTML = (operatingHours = self.restaurant.operating_hours
 /**
  * Create all reviews HTML and add them to the webpage.
  */
-self.fillReviewsHTML = (reviews = self.restaurant.reviews) => {
+self.fillReviewsHTML = (reviews) => {
 	const container = document.getElementById('reviews-container');
 	const title = document.createElement('h4');
 	title.innerHTML = 'Reviews';
 	container.appendChild(title);
 
-	if (!reviews) {
+	if (!reviews || reviews.left === 0) {
 		const noReviews = document.createElement('p');
 		noReviews.innerHTML = 'No reviews yet!';
 		container.appendChild(noReviews);
@@ -157,7 +163,7 @@ self.createReviewHTML = (review) => {
 	li.appendChild(name);
 
 	const date = document.createElement('p');
-	date.innerHTML = review.date;
+	date.innerHTML = new Date(review.createdAt).toDateString();
 	li.appendChild(date);
 
 	const rating = document.createElement('p');

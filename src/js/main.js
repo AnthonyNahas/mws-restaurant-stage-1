@@ -28,7 +28,6 @@ document.addEventListener('DOMContentLoaded', () => {
 	};
 	self.fetchNeighborhoods();
 	self.fetchCuisines();
-	// self.updateRestaurants();
 });
 
 /**
@@ -158,7 +157,7 @@ self.fillRestaurantsHTML = (restaurants = self.restaurants) => {
  * Create restaurant HTML.
  *
  * @param restaurant - the target restaurant to create the corresponding html element
- * @returns {HTMLLIElement} - the correpsonded html element for the targeted restaurant
+ * @returns {HTMLLIElement} - the corresponded html element for the targeted restaurant
  */
 self.createRestaurantHTML = (restaurant) => {
 	const li = document.createElement('li');
@@ -187,7 +186,7 @@ self.createRestaurantHTML = (restaurant) => {
 
 	const likeButton = document.createElement('button');
 
-	likeButton.dataset.isFavorite = restaurant.is_favorite ? restaurant.is_favorite : false;
+	likeButton.dataset.isFavorite = restaurant.is_favorite === 'true' ? true : false;
 	self.setLikeButtonStyles(likeButton);
 	likeButton.setAttribute('aria-label', `Like or dislike ${restaurant.name}'s restaurant`);
 	self.setLikeButtonListener(restaurant, likeButton);
@@ -195,6 +194,7 @@ self.createRestaurantHTML = (restaurant) => {
 
 	const more = document.createElement('a');
 	more.innerHTML = 'View Details';
+	more.href = DBHelper.urlForRestaurant(restaurant);
 	more.setAttribute('aria-label', `View Details of the ${restaurant.name}'s restaurant`);
 	actionsContainer.append(more);
 
@@ -222,7 +222,7 @@ self.addMarkersToMap = (restaurants = self.restaurants) => {
 };
 
 self.setLikeButtonStyles = (button) => {
-	if (button.dataset.isFavorite === 'false') {
+	if (button.dataset.isFavorite === 'true') {
 		button.innerText = '🧡';
 		button.classList.add('isFavorite');
 	} else {
@@ -235,16 +235,16 @@ self.setLikeButtonListener = (restaurant, button) => {
 	button.addEventListener('click', $event => {
 		console.log('before update is favorite of the restaurant', restaurant.is_favorite);
 
-		self.setLikeButtonStyles($event.target);
-
-
 		$event.target.dataset.isFavorite = $event.target.dataset.isFavorite !== 'true';
 
 		restaurant.is_favorite = $event.target.dataset.isFavorite;
 
 		console.log('update is favorite of the restaurant', restaurant.is_favorite);
 
-		// Update the API and IDB
+		// update the button sytles
+		self.setLikeButtonStyles($event.target);
+
+		// Update the restaurant server side and in indexedDB
 		DBHelper.updateRestaurantByIsFavorite(restaurant);
 	});
 };

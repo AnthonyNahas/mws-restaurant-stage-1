@@ -30,7 +30,7 @@ gulp.task('serve', ['build:dev'], () => {
 	watch('dev');
 	browserSync.init({
 		server: './dist',
-		port: 3001
+		port: 3000
 	});
 });
 
