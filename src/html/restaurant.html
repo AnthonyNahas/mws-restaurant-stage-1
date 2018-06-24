@@ -78,7 +78,7 @@
                     </label>
 
                     <label for="rating4" tabindex="0" aria-label="Rating 4 out of 5">
-                        <input type="radio" id="rating4" name="rating" value="4"> 4- That restaurant is really good!
+                        <input type="radio" id="rating4" name="rating" value="4"> 4 - That restaurant is really good!
                     </label>
 
                     <label for="rating3" tabindex="0" aria-label="Rating 3 out of 5">
@@ -95,7 +95,11 @@
                 </div>
 
                 <button type="submit" id="review-submit-button">Post Review</button>
-                <p id="review-status"></p>
+
+                <div id="review-status-container">
+                    <span id="review-status"></span>
+                    <p id="review-status-message"></p>
+                </div>
             </div>
         </form>
     </section>

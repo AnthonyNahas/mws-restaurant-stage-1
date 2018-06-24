@@ -463,6 +463,26 @@ nav h1 a {
     padding: 2rem;
 }
 
+#post-new-review-container #review-status-container {
+    margin-top: 1rem;
+}
+
+#post-new-review-container div #review-status {
+    font-size: 2rem;
+}
+
+#post-new-review-container div #review-status, #review-status-message {
+    text-align: center;
+}
+
+.success {
+    background-color: #11de1178;
+}
+
+.failed {
+    background-color: #ef01017a;
+}
+
 @media screen and (max-width: 800px) {
     #restaurant-container, #reviews-container, .inside #map-container, #post-new-review-container {
         width: 100%;

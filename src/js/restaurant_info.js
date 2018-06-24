@@ -225,6 +225,8 @@ self.setOnClickListenerForReviewSubmitButton = () => {
 		.getElementById('review-submit-button')
 		.addEventListener('click', ($event) => {
 
+			self.resetReviewStatus();
+
 			const form = document.getElementById('post-new-review-form');
 
 			console.log('form: ', form);
@@ -260,18 +262,48 @@ self.setOnClickListenerForReviewSubmitButton = () => {
 					form.reset();
 					$event.preventDefault();
 
-					const newReviewHTML = self.createReviewHTML(reviewToAdd);
+					const postedReview = self.createReviewHTML(reviewToAdd);
 					const ul = document.getElementById('reviews-list');
-					ul.appendChild(newReviewHTML);
+					ul.appendChild(postedReview);
 
+					const reviewStatusContainer = document.getElementById('review-status-container');
 					const reviewStatus = document.getElementById('review-status');
-					reviewStatus.innerText = 'Thanks for reviewing!';
+					const reviewStatusMessage = document.getElementById('review-status-message');
+
+					console.log('posted review result: ', review);
+					console.log('navigator.online: ', navigator.onLine);
+
+					if (review && navigator.onLine) {
+						reviewStatus.innerText = 'Wooohoooow!';
+						reviewStatusMessage.innerText = 'Your review has been successfully posted';
+						reviewStatusContainer.classList.remove('failed');
+						reviewStatusContainer.classList.add('success');
+					}
+					else {
+						reviewStatus.innerText = 'Oups! Failed!!';
+						reviewStatusMessage.innerText = 'Your are now not connected to the Internet! Your ' +
+							'review will be just submitted when you go online! Thanks for understanding!';
+						reviewStatusContainer.classList.remove('success');
+						reviewStatusContainer.classList.add('failed');
+					}
+
 				});
 			}
 
 			console.log('form not completed yet');
 
 		});
+};
+
+self.resetReviewStatus = () => {
+	const reviewStatusContainer = document.getElementById('review-status-container');
+	const reviewStatus = document.getElementById('review-status');
+	const reviewStatusMessage = document.getElementById('review-status-message');
+
+	reviewStatusContainer.classList.remove('success');
+	reviewStatusContainer.classList.remove('failed');
+	reviewStatus.innerText = '';
+	reviewStatusMessage.innerText = '';
 };
 
 self.sendPendingReviews = () => {
@@ -287,6 +319,7 @@ self.sendPendingReviews = () => {
 			);
 		})
 		.then(() => DBHelper.clear('pending-reviews'))
+		.then(() => self.resetReviewStatus())
 		.catch(err => console.error(err));
 };
 
