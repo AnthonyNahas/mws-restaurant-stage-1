@@ -154,11 +154,6 @@ self.fillReviewsHTML = (reviews) => {
 
 	container.appendChild(ul);
 
-	const postReviewButton = document.createElement('button');
-	postReviewButton.innerText = 'Post your review';
-	postReviewButton.setAttribute('aria-label', `post a new review for the ${self.restaurant.name} restaurant`);
-	self.onPostNewReviewClickListener(postReviewButton);
-	container.append(postReviewButton);
 };
 
 /**
@@ -211,17 +206,6 @@ self.getParameterByName = (name, url) => {
 	return decodeURIComponent(results[2].replace(/\+/g, ' '));
 };
 
-self.onPostNewReviewClickListener = (button) => {
-	button.addEventListener('click', $event => {
-		console.log('onPostNewReviewClicked');
-
-		// update the button sytles
-		// self.setLikeButtonStyles($event.target);
-
-		// Update the restaurant server side and in indexedDB
-		// DBHelper.updateRestaurantByIsFavorite(restaurant);
-	});
-};
 
 self.setOnClickListenerForReviewSubmitButton = () => {
 
