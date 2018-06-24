@@ -6,6 +6,7 @@ let map;
  */
 document.addEventListener('DOMContentLoaded', () => {
 	self.registerServiceWorker();
+	self.setOnClickListenerForReviewSubmitButton();
 
 	// Initialize Google map, called from HTML.
 	window.initMap = () => {
@@ -150,7 +151,14 @@ self.fillReviewsHTML = (reviews) => {
 	reviews.forEach(review => {
 		ul.appendChild(self.createReviewHTML(review));
 	});
+
 	container.appendChild(ul);
+
+	const postReviewButton = document.createElement('button');
+	postReviewButton.innerText = 'Post your review';
+	postReviewButton.setAttribute('aria-label', `post a new review for the ${self.restaurant.name} restaurant`);
+	self.onPostNewReviewClickListener(postReviewButton);
+	container.append(postReviewButton);
 };
 
 /**
@@ -202,3 +210,81 @@ self.getParameterByName = (name, url) => {
 		return '';
 	return decodeURIComponent(results[2].replace(/\+/g, ' '));
 };
+
+self.onPostNewReviewClickListener = (button) => {
+	button.addEventListener('click', $event => {
+		console.log('onPostNewReviewClicked');
+
+		// update the button sytles
+		// self.setLikeButtonStyles($event.target);
+
+		// Update the restaurant server side and in indexedDB
+		// DBHelper.updateRestaurantByIsFavorite(restaurant);
+	});
+};
+
+self.setOnClickListenerForReviewSubmitButton = () => {
+
+	// process the review form
+	document
+		.getElementById('review-submit-button')
+		.addEventListener('click', ($event) => {
+
+			const form = document.getElementById('post-new-review-form');
+
+			console.log('form: ', form);
+			let name = document.getElementById('review-name').value;
+			let comments = document.getElementById('review-text').value;
+
+			console.log('name: ', name, ' comments: ', comments);
+
+			if (name && comments) {
+
+				$event.preventDefault();
+
+				let rating = parseInt(
+					document.querySelector('input[name="rating"]:checked').value
+				);
+
+				let reviewToAdd = {
+					restaurant_id: self.restaurant.id,
+					name,
+					rating,
+					comments,
+					createdAt: Date.now(),
+					updatedAt: Date.now()
+				};
+
+				console.log('new review:', reviewToAdd);
+
+				// Send the review to the api when connected! Else,
+				// store the review in the pendings-review store
+
+				DBHelper.postReview(reviewToAdd).then((review) => {
+
+					form.reset();
+					$event.preventDefault();
+
+					const newReviewHTML = self.createReviewHTML(reviewToAdd);
+					const ul = document.getElementById('reviews-list');
+					ul.appendChild(newReviewHTML);
+
+					const reviewStatus = document.getElementById('review-status');
+					reviewStatus.innerText = 'Thanks for reviewing!';
+				});
+			}
+
+			console.log('form not completed yet');
+
+		});
+
+};
+
+function validateForm() {
+	var x = document.forms['post-new-review-form'];
+	console.log('my Form: ', x);
+	if (x == '') {
+		alert('Name must be filled out');
+		return false;
+	}
+}

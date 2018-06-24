@@ -346,6 +346,10 @@ nav h1 a {
     order: 1;
 }
 
+#reviews-container button {
+    margin: 0 1rem 1rem 1rem;
+}
+
 #restaurant-container .restaurant-img {
     display: block;
     margin-left: auto;
@@ -438,6 +442,25 @@ nav h1 a {
 #restaurant-hours td {
     color: #666;
     margin: 1rem;
+}
+
+#post-new-review-container {
+    display: flex;
+    order: 4;
+    width: 50%;
+    /*padding: 2rem 1rem 0 1rem;*/
+    flex-direction: column;
+    flex-wrap: wrap;
+}
+
+#post-new-review-container h3 {
+    margin: 2rem;
+}
+
+#post-new-review-container div {
+    display: flex;
+    flex-direction: column;
+    padding: 2rem;
 }
 
 @media screen and (max-width: 800px) {

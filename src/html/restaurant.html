@@ -59,6 +59,46 @@
     <section id="reviews-container">
         <ul id="reviews-list"></ul>
     </section>
+
+    <section id="post-new-review-container">
+        <h3>Your turn to post a review:</h3>
+        <form id="post-new-review-form" method="post" action="">
+            <div class="review-form-wrapper">
+                <label for="review-name">Name:</label>
+                <input type="text" id="review-name" aria-label="Name" aria-required="true" required>
+
+                <label for="review-text">Review:</label>
+                <textarea type="textarea" id="review-text" aria-label="Review text" rows="4" aria-required="true"
+                          required></textarea>
+
+                <h4>Rating - What do you thinks about this restaurant ?</h4>
+                <div>
+                    <label for="rating5" tabindex="0" aria-label="Rating 5 out of 5">
+                        <input type="radio" id="rating5" name="rating" value="5"> 5 - Awesome Restaurant!
+                    </label>
+
+                    <label for="rating4" tabindex="0" aria-label="Rating 4 out of 5">
+                        <input type="radio" id="rating4" name="rating" value="4"> 4- That restaurant is really good!
+                    </label>
+
+                    <label for="rating3" tabindex="0" aria-label="Rating 3 out of 5">
+                        <input type="radio" id="rating3" name="rating" value="3" checked> 3 - That was not bad!
+                    </label>
+
+                    <label for="rating2" tabindex="0" aria-label="Rating 2 out of 5">
+                        <input type="radio" id="rating2" name="rating" value="2"> 2 - It was ok... !
+                    </label>
+
+                    <label for="rating1" tabindex="0" aria-label="Rating 1 out of 5">
+                        <input type="radio" id="rating1" name="rating" value="1"> 1 - Never again!
+                    </label>
+                </div>
+
+                <button type="submit" id="review-submit-button">Post Review</button>
+                <p id="review-status"></p>
+            </div>
+        </form>
+    </section>
     <!-- End reviews -->
 </main>
 <!-- End main -->

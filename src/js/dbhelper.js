@@ -48,7 +48,7 @@ class DBHelper {
 	/**
 	 * Adding data to the indexedDB by transaction and store name
 	 */
-	static addAllToDB(transactionAndStoreName, data) {
+	static addAll(transactionAndStoreName, data) {
 		return this.openDB()
 			.then(db => {
 				const tx = db.transaction(transactionAndStoreName, 'readwrite');
@@ -66,13 +66,13 @@ class DBHelper {
 			.catch(err => console.error(err));
 	}
 
-	static addRestaurantByIDToDB(restaurant) {
+	static add(transactionAndStoreName, data) {
 		return this.openDB()
 			.then(db => {
-				const tx = db.transaction('restaurants', 'readwrite');
-				let store = tx.objectStore('restaurants');
-				console.log('addRestaurandByIDToDB', restaurant);
-				return store.put(restaurant)
+				const tx = db.transaction(transactionAndStoreName, 'readwrite');
+				let store = tx.objectStore(transactionAndStoreName);
+				console.log(`adding ${transactionAndStoreName}`, data);
+				return store.put(data)
 					.catch(err => {
 						tx.abort();
 						console.error(err);
@@ -119,7 +119,7 @@ class DBHelper {
 		return fetch(this.RESTAURANTS_URL)
 			.then(result => result.json())
 			.then(restaurants => {
-				this.addAllToDB('restaurants', restaurants);
+				this.addAll('restaurants', restaurants);
 				return restaurants;
 			})
 			.catch(err => err);
@@ -130,7 +130,7 @@ class DBHelper {
 			.then(result => result.json())
 			.then(restaurant => {
 				console.log('getRestaurantByIDFromDB not found -> ', restaurant);
-				this.addRestaurantByIDToDB(restaurant);
+				this.add('restaurants', restaurant);
 				return restaurant;
 			})
 			.catch(err => err);
@@ -184,7 +184,7 @@ class DBHelper {
 			.then(result => result.json())
 			.then(reviews => {
 				console.log('fetchRestaurantReviews -> ', reviews);
-				this.addAllToDB('reviews', reviews);
+				this.addAll('reviews', reviews);
 				return reviews;
 			})
 			.catch(err => err);
@@ -326,7 +326,7 @@ class DBHelper {
 		)
 			.then(response => response.json())
 			.then(data => {
-				this.addRestaurantByIDToDB(data);
+				this.add('restaurants', data);
 				console.log('update done: ', data);
 				return data;
 			})
@@ -396,5 +396,31 @@ class DBHelper {
 			const index = db.transaction(transactionName).objectStore(storeName);
 			return index.getAll();
 		});
+	}
+
+	/**
+	 * Post new review to API
+	 */
+	static postReview(review) {
+
+		return fetch(`${DBHelper.REVIEWS_URL}`, {
+			method: 'POST',
+			body: JSON.stringify(review),
+			headers: {
+				'Content-Type': 'application/json'
+			}
+		})
+			.then(resp => resp.json())
+			.then(data => {
+				// store it in the reviews store
+				DBHelper.add('reviews', data);
+				return data;
+			})
+			.catch(err => {
+				// when connection is down, store the review in db to send it later 
+				DBHelper.add('pending-reviews', review);
+				console.log(`Error: ${err}`);
+				return review;
+			});
 	}
 }
