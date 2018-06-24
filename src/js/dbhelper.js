@@ -82,28 +82,28 @@ class DBHelper {
 	}
 
 	/**
-	 * Get all restaurants from db
+	 * Get all data from db by storename
 	 *
-	 * @returns {PromiseLike<T> | Promise<T>} - the stored restaurants
+	 * @returns {PromiseLike<T> | Promise<T>} - the stored data
 	 */
 	static getAllFromDB(transactionAndStoreName) {
 		return this.openDB()
 			.then(db => {
-				const restaurants = db
+				const data = db
 					.transaction(transactionAndStoreName, 'readwrite')
 					.objectStore(transactionAndStoreName)
 					.getAll();
 
-				console.log('getAllRestaurantsFromDB: ', restaurants);
-				return restaurants;
+				console.log('getAllRestaurantsFromDB: ', data);
+				return data;
 			});
 	}
 
 	static getDataByIDFromDB(transactionAndStoreName, id) {
 		return this.openDB()
 			.then(db => {
-					var tx = db.transaction(transactionAndStoreName, 'readonly');
-					var store = tx.objectStore(transactionAndStoreName);
+					const tx = db.transaction(transactionAndStoreName, 'readonly');
+					const store = tx.objectStore(transactionAndStoreName);
 					return store.get(parseInt(id));
 				}
 			);
@@ -389,16 +389,6 @@ class DBHelper {
 	}
 
 	/**
-	 * get all from db by transaction and store
-	 */
-	static getAll(transactionName, storeName) {
-		return DBHelper.openDB().then(db => {
-			const index = db.transaction(transactionName).objectStore(storeName);
-			return index.getAll();
-		});
-	}
-
-	/**
 	 * Post new review to API
 	 */
 	static postReview(review) {
@@ -422,5 +412,18 @@ class DBHelper {
 				console.log(`Error: ${err}`);
 				return review;
 			});
+	}
+
+	/**
+	 * clear the store by store name
+	 */
+	static clear(transactionAndStoreName) {
+		return DBHelper.openDB().then(db => {
+			const tx = db
+				.transaction(transactionAndStoreName, 'readwrite')
+				.objectStore(transactionAndStoreName)
+				.clear();
+			return tx.complete;
+		});
 	}
 }

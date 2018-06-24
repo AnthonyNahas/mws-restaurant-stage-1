@@ -1,4 +1,5 @@
 let restaurant;
+let reviews;
 let map;
 
 /**
@@ -7,6 +8,9 @@ let map;
 document.addEventListener('DOMContentLoaded', () => {
 	self.registerServiceWorker();
 	self.setOnClickListenerForReviewSubmitButton();
+
+	// retry to send pending reviews to the api when the use is connected
+	window.addEventListener('online', self.sendPendingReviews);
 
 	// Initialize Google map, called from HTML.
 	window.initMap = () => {
@@ -23,7 +27,12 @@ document.addEventListener('DOMContentLoaded', () => {
 					DBHelper.mapMarkerForRestaurant(self.restaurant, self.map);
 				}, 2000);
 				self.fillBreadcrumb();
+				self.reviews = [];
+				console.log('self.reviews', self.reviews);
+				return DBHelper.getAllFromDB('pending-reviews');
 			})
+			.then(pendingReviews => self.reviews.push(...pendingReviews))
+			.then(() => self.sendPendingReviews())
 			.catch(error => console.error(error));  // Got an error!
 	};
 
@@ -106,8 +115,9 @@ self.fillRestaurantHTML = (restaurant = self.restaurant) => {
 	// fill reviews
 	DBHelper.fetchRestaurantReviewsByID(restaurant.id)
 		.then(reviews => {
+			self.reviews.push(...reviews);
 			console.log('on fetchRestaurantReviewsByID: ', reviews);
-			self.fillReviewsHTML(reviews);
+			self.fillReviewsHTML();
 		})
 		.catch(error => console.error(error));
 };
@@ -135,20 +145,20 @@ self.fillRestaurantHoursHTML = (operatingHours = self.restaurant.operating_hours
 /**
  * Create all reviews HTML and add them to the webpage.
  */
-self.fillReviewsHTML = (reviews) => {
+self.fillReviewsHTML = () => {
 	const container = document.getElementById('reviews-container');
 	const title = document.createElement('h4');
 	title.innerHTML = 'Reviews';
 	container.appendChild(title);
 
-	if (!reviews || reviews.left === 0) {
+	if (!self.reviews || self.reviews.left === 0) {
 		const noReviews = document.createElement('p');
 		noReviews.innerHTML = 'No reviews yet!';
 		container.appendChild(noReviews);
 		return;
 	}
 	const ul = document.getElementById('reviews-list');
-	reviews.forEach(review => {
+	self.reviews.forEach(review => {
 		ul.appendChild(self.createReviewHTML(review));
 	});
 
@@ -261,5 +271,20 @@ self.setOnClickListenerForReviewSubmitButton = () => {
 			console.log('form not completed yet');
 
 		});
+};
+
+self.sendPendingReviews = () => {
+	DBHelper.getAllFromDB('pending-reviews')
+		.then(reviews => {
+			console.log('all pending reviews - online: ', reviews);
+			return Promise.all(
+				reviews.map(review => {
+					console.log('review: ', review);
+					return DBHelper.postReview(review);
+				})
+			);
+		})
+		.then(() => DBHelper.clear('pending-reviews'))
+		.catch(err => console.error(err));
 };
 
