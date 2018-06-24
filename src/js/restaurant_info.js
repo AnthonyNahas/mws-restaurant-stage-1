@@ -14,7 +14,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 	// Initialize Google map, called from HTML.
 	window.initMap = () => {
-		self.registerServiceWorker();
 		self.fetchRestaurantFromURL()
 			.then(restaurant => {
 				console.log('window.initMap with resto: ', restaurant);
@@ -115,8 +114,10 @@ self.fillRestaurantHTML = (restaurant = self.restaurant) => {
 	// fill reviews
 	DBHelper.fetchRestaurantReviewsByID(restaurant.id)
 		.then(reviews => {
-			self.reviews.push(...reviews);
-			console.log('on fetchRestaurantReviewsByID: ', reviews);
+			if (reviews) {
+				self.reviews.push(...reviews);
+			}
+			console.log('on fetchRestaurantReviewsByID: ', self.reviews);
 			self.fillReviewsHTML();
 		})
 		.catch(error => console.error(error));
@@ -151,7 +152,7 @@ self.fillReviewsHTML = () => {
 	title.innerHTML = 'Reviews';
 	container.appendChild(title);
 
-	if (!self.reviews || self.reviews.left === 0) {
+	if (!self.reviews || self.reviews.length === 0) {
 		const noReviews = document.createElement('p');
 		noReviews.innerHTML = 'No reviews yet!';
 		container.appendChild(noReviews);
@@ -254,7 +255,7 @@ self.setOnClickListenerForReviewSubmitButton = () => {
 				// Send the review to the api when connected! Else,
 				// store the review in the pendings-review store
 
-				DBHelper.postReview(reviewToAdd).then((review) => {
+				return DBHelper.postReview(reviewToAdd).then((review) => {
 
 					form.reset();
 					$event.preventDefault();
@@ -279,6 +280,7 @@ self.sendPendingReviews = () => {
 			console.log('all pending reviews - online: ', reviews);
 			return Promise.all(
 				reviews.map(review => {
+					delete review.id;
 					console.log('review: ', review);
 					return DBHelper.postReview(review);
 				})
