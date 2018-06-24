@@ -417,7 +417,7 @@ class DBHelper {
 				return data;
 			})
 			.catch(err => {
-				// when connection is down, store the review in db to send it later 
+				// when connection is down, store the review in db to send it later
 				DBHelper.add('pending-reviews', review);
 				console.log(`Error: ${err}`);
 				return review;

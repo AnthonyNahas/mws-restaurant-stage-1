@@ -464,7 +464,7 @@ nav h1 a {
 }
 
 @media screen and (max-width: 800px) {
-    #restaurant-container, #reviews-container, .inside #map-container {
+    #restaurant-container, #reviews-container, .inside #map-container, #post-new-review-container {
         width: 100%;
         padding: 0;
     }
