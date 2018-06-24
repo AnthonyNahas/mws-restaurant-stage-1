@@ -261,14 +261,5 @@ self.setOnClickListenerForReviewSubmitButton = () => {
 			console.log('form not completed yet');
 
 		});
-
 };
 
-function validateForm() {
-	var x = document.forms['post-new-review-form'];
-	console.log('my Form: ', x);
-	if (x == '') {
-		alert('Name must be filled out');
-		return false;
-	}
-}
