@@ -35,7 +35,7 @@ class DBHelper {
 
 			upgradeDb.createObjectStore('reviews', {
 				keyPath: 'id',
-			});
+			}).createIndex('restaurant_id', 'restaurant_id');
 
 			upgradeDb.createObjectStore('pending-reviews', {
 				keyPath: 'id',
@@ -99,6 +99,20 @@ class DBHelper {
 			});
 	}
 
+	static getAllReviewsFromDBByRestaurantID(transactionAndStoreName, id) {
+		return this.openDB()
+			.then(db => {
+				const data = db
+					.transaction(transactionAndStoreName, 'readwrite')
+					.objectStore(transactionAndStoreName)
+					.index('restaurant_id')
+					.getAll(parseInt(id));
+
+				console.log('getAllRestaurantsFromDB: ', data);
+				return data;
+			});
+	}
+
 	static getDataByIDFromDB(transactionAndStoreName, id) {
 		return this.openDB()
 			.then(db => {
@@ -129,7 +143,7 @@ class DBHelper {
 		return fetch(`${this.RESTAURANTS_URL}/${id}`)
 			.then(result => result.json())
 			.then(restaurant => {
-				console.log('getRestaurantByIDFromDB not found -> ', restaurant);
+				console.log('getRestaurantByIDFromDB found -> ', restaurant);
 				this.add('restaurants', restaurant);
 				return restaurant;
 			})
@@ -163,7 +177,7 @@ class DBHelper {
 	 */
 	static fetchRestaurantReviewsByID(id) {
 
-		return this.getDataByIDFromDB('reviews', id)
+		return this.getAllReviewsFromDBByRestaurantID('reviews', id)
 			.then(reviews => {
 				console.log('reviews size in db : ', reviews.length);
 				if (reviews && reviews.length > 0) {
@@ -180,7 +194,7 @@ class DBHelper {
 	 * Fetch all reviews of a restaurant by restaurant's id
 	 */
 	static fetchRestaurantReviewsFromAPI(id) {
-		return fetch(`${this.REVIEWS_URL}/?restaurant_id=${id}`)
+		return fetch(`${this.REVIEWS_URL}/?restaurant_id=${id}`, {cache: 'reload'})
 			.then(result => result.json())
 			.then(reviews => {
 				console.log('fetchRestaurantReviews -> ', reviews);
