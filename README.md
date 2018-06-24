@@ -26,9 +26,9 @@ Now that you’ve connected your application to an external database, it’s tim
 
 **Meet the new performance requirements**: In addition to adding new features, the performance targets you met in Stage Two have tightened. Using Lighthouse, you’ll need to measure your site performance against the new targets.
 
-**Progressive Web App** `score` should be at **90** or better.
-**Performance** `score` should be at **90** or better.
-**Accessibility** `score` should be at **90** or better.
++ **Progressive Web App** `score` should be at **90** or better.
++ **Performance** `score` should be at **90** or better.
++ **Accessibility** `score` should be at **90** or better.
 
 ### Note about ES6
 
@@ -39,7 +39,7 @@ Most of the code in this project has been written to the ES6 JavaScript specific
 
 # Author: Anthony Nahas
 
-Stage 2 consists of two parts!
+Stage 3 consists of two parts!
 
 - server side (NodeJS)
 - client side (html, css, js) - hosted with NodeJS and express
