@@ -14,25 +14,31 @@ document.addEventListener('DOMContentLoaded', () => {
 
 	// Initialize Google map, called from HTML.
 	window.initMap = () => {
-		self.fetchRestaurantFromURL()
-			.then(restaurant => {
-				console.log('window.initMap with resto: ', restaurant);
-				setTimeout(() => {
-					self.map = new google.maps.Map(document.getElementById('map'), {
-						zoom: 16,
-						center: restaurant.latlng,
-						scrollwheel: false
-					});
-					DBHelper.mapMarkerForRestaurant(self.restaurant, self.map);
-				}, 2000);
-				self.fillBreadcrumb();
-				self.reviews = [];
-				console.log('self.reviews', self.reviews);
-				return DBHelper.getAllFromDB('pending-reviews');
-			})
-			.then(pendingReviews => self.reviews.push(...pendingReviews))
-			.then(() => self.sendPendingReviews())
-			.catch(error => console.error(error));  // Got an error!
+		DBHelper.getAllFromDB('pending-reviews').then(pendingReviews => {
+			console.log('pending reviews from db: ', pendingReviews);
+			self.reviews = [];
+			console.log('self.reviews before: ', self.reviews);
+			self.reviews.push(...pendingReviews);
+			console.log('self.reviews after: ', self.reviews);
+
+			self.fetchRestaurantFromURL()
+				.then(restaurant => {
+					console.log('window.initMap with resto: ', restaurant);
+					setTimeout(() => {
+						self.map = new google.maps.Map(document.getElementById('map'), {
+							zoom: 16,
+							center: restaurant.latlng,
+							scrollwheel: false
+						});
+						DBHelper.mapMarkerForRestaurant(self.restaurant, self.map);
+					}, 2000);
+					self.fillBreadcrumb();
+					console.log('self.reviews', self.reviews);
+					return DBHelper.getAllFromDB('pending-reviews');
+				})
+				.then(() => self.sendPendingReviews())
+				.catch(error => console.error(error));  // Got an error!
+		});
 	};
 
 });
@@ -75,7 +81,7 @@ self.fetchRestaurantFromURL = () => {
 			DBHelper.fetchRestaurantById(id)
 				.then(restaurant => {
 					self.restaurant = restaurant;
-					console.log('fetched resto by id: ', restaurant);
+					// console.log('fetched resto by id: ', restaurant);
 					self.fillRestaurantHTML();
 					resolve(restaurant);
 				})
@@ -115,7 +121,9 @@ self.fillRestaurantHTML = (restaurant = self.restaurant) => {
 	DBHelper.fetchRestaurantReviewsByID(restaurant.id)
 		.then(reviews => {
 			if (reviews) {
+				console.log('self.reviews before 2: ', self.reviews);
 				self.reviews.push(...reviews);
+				console.log('self.reviews after 2: ', self.reviews);
 			}
 			console.log('on fetchRestaurantReviewsByID: ', self.reviews);
 			self.fillReviewsHTML();
@@ -307,19 +315,21 @@ self.resetReviewStatus = () => {
 };
 
 self.sendPendingReviews = () => {
-	DBHelper.getAllFromDB('pending-reviews')
-		.then(reviews => {
-			console.log('all pending reviews - online: ', reviews);
-			return Promise.all(
-				reviews.map(review => {
-					delete review.id;
-					console.log('review: ', review);
-					return DBHelper.postReview(review);
-				})
-			);
-		})
-		.then(() => DBHelper.clear('pending-reviews'))
-		.then(() => self.resetReviewStatus())
-		.catch(err => console.error(err));
+	if (navigator.onLine) {
+		DBHelper.getAllFromDB('pending-reviews')
+			.then(reviews => {
+				console.log('all pending reviews - online: ', reviews);
+				return Promise.all(
+					reviews.map(review => {
+						console.log('pending-review: ', review);
+						return DBHelper.postPendingReview(review);
+					})
+				);
+			})
+			// todo: only after sending the pending review should be deleted!
+			// close and re-open the tab! the pending review should be still available
+			.then(() => self.resetReviewStatus())
+			.catch(err => console.error(err));
+	}
 };
 

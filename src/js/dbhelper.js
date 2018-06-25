@@ -89,13 +89,10 @@ class DBHelper {
 	static getAllFromDB(transactionAndStoreName) {
 		return this.openDB()
 			.then(db => {
-				const data = db
+				return db
 					.transaction(transactionAndStoreName, 'readwrite')
 					.objectStore(transactionAndStoreName)
 					.getAll();
-
-				console.log('getAllRestaurantsFromDB: ', data);
-				return data;
 			});
 	}
 
@@ -143,7 +140,7 @@ class DBHelper {
 		return fetch(`${this.RESTAURANTS_URL}/${id}`)
 			.then(result => result.json())
 			.then(restaurant => {
-				console.log('getRestaurantByIDFromDB found -> ', restaurant);
+				// console.log('getRestaurantByIDFromDB found -> ', restaurant);
 				this.add('restaurants', restaurant);
 				return restaurant;
 			})
@@ -228,7 +225,7 @@ class DBHelper {
 		return this.getDataByIDFromDB('restaurant', id)
 			.then(restaurant => {
 				if (restaurant) {
-					console.log('getRestaurantByIDFromDB found -> ', restaurant);
+					// console.log('getRestaurantByIDFromDB found -> ', restaurant);
 					return restaurant;
 				}
 				return this.fetchRestaurantsFromAPIByID(id);
@@ -426,6 +423,48 @@ class DBHelper {
 				console.log(`Error: ${err}`);
 				return null;
 			});
+	}
+
+	/**
+	 * Post new review to API
+	 */
+	static postPendingReview(review) {
+
+		const reviewToPost = {
+			comments: review.comments,
+			createdAt: review.createdAt,
+			updatedAt: review.updatedAt,
+			name: review.name,
+			rating: review.rating,
+			restaurant_id: review.restaurant_id
+		};
+
+		return fetch(`${DBHelper.REVIEWS_URL}`, {
+			method: 'POST',
+			body: JSON.stringify(reviewToPost),
+			headers: {
+				'Content-Type': 'application/json'
+			}
+		})
+			.then(resp => resp.json())
+			.then(data => {
+				console.log('data from api: ', data);
+				// store it in the reviews store
+				return DBHelper.add('reviews', data);
+			})
+			.then(() => DBHelper.deleteFromDB('pending-reviews', review.id))
+			.catch(err => {
+				console.log(`Error: ${err}`);
+				return err;
+			});
+	}
+
+	static deleteFromDB(transactionAndStoreName, id) {
+		return DBHelper.openDB().then(db => {
+			const tx = db.transaction(transactionAndStoreName, 'readwrite');
+			tx.objectStore(transactionAndStoreName).delete(id);
+			return tx.complete;
+		});
 	}
 
 	/**
